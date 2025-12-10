@@ -32,12 +32,12 @@ The project contains the following steps:
 ## Setup of AWS environment
 
 1. Create a dedicated VPC for hosting our containerised application in Amazon ECS with the following options:
-    * Name: EduTech-VPC
-    * Availability Zones: 2
-    * Number of public subnets: 2
-    * Number of private subnets: 0 (simplified for this implementation)
-    * NAT Gateways: None (cost optimization)
-    * VPC Endpoints: None
+    * `Name`: EduTech-VPC
+    * `Availability Zones`: 2
+    * `Number of public subnets`: 2
+    * `Number of private subnet`s: 0 (simplified for this implementation)
+    * `NAT Gateways`: None (cost optimization)
+    * `VPC Endpoints`: None
 
 ![alt text](images/image1.png)
 ![alt text](images/image2.png)
@@ -46,8 +46,8 @@ The project contains the following steps:
 ![alt text](images/image4.png)
 
 2. Create the following security groups for Application Load Balancer (ALB) and container with relevant inbound and outbound rules
-    * EduTech-ALB-SG
-    * EduTech-Container-SG
+    * `EduTech-ALB-SG`
+    * `EduTech-Container-SG`
 
 ![alt text](images/image5.png)
 ![alt text](images/image6.png)
