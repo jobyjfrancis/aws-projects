@@ -27,11 +27,11 @@ The project contains the following steps:
 * Amazon ECR: Container registry for managing and deploying images
 * AWS Security Groups: Virtual firewalls controlling network traffic
 
-# Actions:
+# Actions performed:
 
 ## Setup of AWS environment
 
-1. Create a dedicated VPC for hosting our containerised application in Amazon ECS with the following options:
+1. Created a dedicated VPC for hosting our containerised application in Amazon ECS with the following options:
     * `Name`: EduTech-VPC
     * `Availability Zones`: 2
     * `Number of public subnets`: 2
@@ -45,7 +45,7 @@ The project contains the following steps:
 
 ![alt text](images/image4.png)
 
-2. Create the following security groups for Application Load Balancer (ALB) and container with relevant inbound and outbound rules
+2. Created the following security groups for Application Load Balancer (ALB) and container with relevant inbound and outbound rules
     * `EduTech-ALB-SG`
     * `EduTech-Container-SG`
 
@@ -53,6 +53,30 @@ The project contains the following steps:
 ![alt text](images/image6.png)
 
 ![alt text](images/image7.png)
+
+3. Created the required IAM roles for ECS service and task execution
+    * `EduTech-ECS-Service-Role`
+    * `EduTech-ECS-Task-Role`
+
+![alt text](images/image8.png)
+![alt text](images/image9.png)
+![alt text](images/image10.png)
+
+## Containerisation of LMS frontend application
+
+1. The application code is available in this repository under https://github.com/jobyjfrancis/aws-projects/tree/main/containerized-LMS-migration/edutech-project/frontend
+
+2. Created the required `Dockerfile` for the application to containerise it - https://github.com/jobyjfrancis/aws-projects/blob/main/containerized-LMS-migration/edutech-project/frontend/Dockerfile
+
+3. Created a repository named `edutech-lms-frontend` in Amazon ECR (Elastic Container Registry)
+
+![alt text](images/image11.png)
+
+4. Checked the commands in the `View push commands` in Amazon ECR and executed them one by one to build the docker image for the LMS frontend application and push it to the ECR repository `edutech-lms-frontend`. 
+
+```
+
+```
 
 
 
