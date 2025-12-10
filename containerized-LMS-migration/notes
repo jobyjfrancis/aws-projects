@@ -1,0 +1,14 @@
+VPC ID: EduTech-VPC-vpc / vpc-0e3ba3990b6501b2b
+
+Subnets:
+EduTech-VPC-subnet-public1-ap-southeast-2a subnet-0dfb97cb57484a3d4
+
+EduTech-VPC-subnet-public2-ap-southeast-2b subnet-026322648c21e1c76
+
+Security Groups:
+EduTech-Container-SG sg-0e2cf3347f49c575d
+EduTech-ALB-SG sg-0a9072f23fc402a36
+
+IAM Roles:
+EduTech-ECS-Service-Role arn:aws:iam::041332534734:role/EduTech-ECS-Service-Role
+EduTech-ECS-Task-Role arn:aws:iam::041332534734:role/EduTech-ECS-Task-Role
