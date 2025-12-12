@@ -74,13 +74,13 @@ The project contains the following steps:
 
 4. Checked the commands in the `View push commands` in Amazon ECR and executed them one by one to build the docker image for the LMS frontend application and push it to the ECR repository `edutech-lms-frontend`. 
 
-### Docker login to the Amazon ECR repository
+#### Docker login to the Amazon ECR repository
 ```
 joby@LAPTOP-KVPR8SO6:~/learn/aws-projects (main)$ aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin 041332534734.dkr.ecr.ap-southeast-2.amazonaws.com
 Login Succeeded
 joby@LAPTOP-KVPR8SO6:~/learn/aws-projects (main)$
 ```
-### Build the docker image
+#### Build the docker image
 ```
 joby@LAPTOP-KVPR8SO6:~/learn/aws-projects (main)$ cd containerized-LMS-migration/edutech-project/frontend/
 joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$ docker build -t edutech-lms-frontend .
@@ -116,7 +116,7 @@ REPOSITORY             TAG       IMAGE ID       CREATED      SIZE
 edutech-lms-frontend   latest    7c86939d65a5   4 days ago   1.28GB
 joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$
 ```
-### Tag the docker image appropriately so that it can be pushed to Amazon ECR 
+#### Tag the docker image appropriately so that it can be pushed to Amazon ECR 
 ```
 joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$ docker tag edutech-lms-frontend:latest 041332534734.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend:latest
 joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$
@@ -129,7 +129,7 @@ REPOSITORY                                                               TAG    
 edutech-lms-frontend                                                     latest    7c86939d65a5   4 days ago   1.28GB
 joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$
 ```
-### Push the docker image to ECR repository
+#### Push the docker image to ECR repository
 ```
 joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$ docker push 041332534734.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend:latest
 The push refers to repository [041332534734.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend]
