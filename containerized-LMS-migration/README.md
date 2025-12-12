@@ -74,9 +74,82 @@ The project contains the following steps:
 
 4. Checked the commands in the `View push commands` in Amazon ECR and executed them one by one to build the docker image for the LMS frontend application and push it to the ECR repository `edutech-lms-frontend`. 
 
+### Docker login to the Amazon ECR repository
 ```
+joby@LAPTOP-KVPR8SO6:~/learn/aws-projects (main)$ aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin 041332534734.dkr.ecr.ap-southeast-2.amazonaws.com
+Login Succeeded
+joby@LAPTOP-KVPR8SO6:~/learn/aws-projects (main)$
+```
+### Build the docker image
+```
+joby@LAPTOP-KVPR8SO6:~/learn/aws-projects (main)$ cd containerized-LMS-migration/edutech-project/frontend/
+joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$ docker build -t edutech-lms-frontend .
+[+] Building 12.9s (12/12) FINISHED                                                                                              docker:default
+ => [internal] load build definition from Dockerfile                                                                                       0.0s
+ => => transferring dockerfile: 465B                                                                                                       0.0s
+ => [internal] load metadata for docker.io/library/node:16-alpine                                                                          1.8s
+ => [internal] load .dockerignore                                                                                                          0.0s
+ => => transferring context: 2B                                                                                                            0.0s
+ => [1/7] FROM docker.io/library/node:16-alpine@sha256:a1f9d027912b58a7c75be7716c97cfbc6d3099f3a97ed84aa490be9dee20e787                    0.0s
+ => => resolve docker.io/library/node:16-alpine@sha256:a1f9d027912b58a7c75be7716c97cfbc6d3099f3a97ed84aa490be9dee20e787                    0.0s
+ => [internal] load build context                                                                                                          0.0s
+ => => transferring context: 5.16kB                                                                                                        0.0s
+ => CACHED [2/7] WORKDIR /app                                                                                                              0.0s
+ => CACHED [3/7] COPY package*.json ./                                                                                                     0.0s
+ => CACHED [4/7] RUN npm install                                                                                                           0.0s
+ => CACHED [5/7] COPY . .                                                                                                                  0.0s
+ => CACHED [6/7] RUN npm run build                                                                                                         0.0s
+ => CACHED [7/7] RUN npm install -g serve                                                                                                  0.0s
+ => exporting to image                                                                                                                    10.9s
+ => => exporting layers                                                                                                                    0.0s
+ => => exporting manifest sha256:3fc3f644b1156eb888d99998110f5a3a91b0b3aad0f3a39c942b63cae69a8b66                                          0.0s
+ => => exporting config sha256:b1f2b3c68878c427aa786dd5796dbd5326423c6e3de343703389da5f19e644a8                                            0.0s
+ => => exporting attestation manifest sha256:ea9f5a9a9337cbf22fa18bac5836ed779375aeb390fea4d729c7d5c7ca415293                              0.0s
+ => => exporting manifest list sha256:7c86939d65a53e2c462593e4607352da9d18ee8506c73e04ca27c7943ca2a859                                     0.0s
+ => => naming to docker.io/library/edutech-lms-frontend:latest                                                                             0.0s
+ => => unpacking to docker.io/library/edutech-lms-frontend:latest                                                                         10.8s
+joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$
+```
+```
+joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$ docker images
+REPOSITORY             TAG       IMAGE ID       CREATED      SIZE
+edutech-lms-frontend   latest    7c86939d65a5   4 days ago   1.28GB
+joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$
+```
+### Tag the docker image appropriately so that it can be pushed to Amazon ECR 
+```
+joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$ docker tag edutech-lms-frontend:latest 041332534734.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend:latest
+joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$
+joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$
+```
+```
+joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$ docker images
+REPOSITORY                                                               TAG       IMAGE ID       CREATED      SIZE
+041332534734.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend   latest    7c86939d65a5   4 days ago   1.28GB
+edutech-lms-frontend                                                     latest    7c86939d65a5   4 days ago   1.28GB
+joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$
+```
+### Push the docker image to ECR repository
+```
+joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$ docker push 041332534734.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend:latest
+The push refers to repository [041332534734.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend]
+eee371b9ce3f: Layer already exists
+a0dbbb7f946b: Layer already exists
+14a72bc6a89c: Layer already exists
+929675baf485: Layer already exists
+d743060c8c6f: Layer already exists
+7264a8db6415: Layer already exists
+60f5c5ad5935: Layer already exists
+39f048e446a7: Layer already exists
+322b195c9484: Pushed
+d9059661ce70: Layer already exists
+93b3025fe103: Layer already exists
+latest: digest: sha256:7c86939d65a53e2c462593e4607352da9d18ee8506c73e04ca27c7943ca2a859 size: 856
+joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$
+```
+5. Checked the ECR repository console and confirmed that the image has been uploaded
 
-```
+![alt text](images/image12.png)
 
 
 
