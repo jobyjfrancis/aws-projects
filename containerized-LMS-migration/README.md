@@ -151,6 +151,36 @@ joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-pr
 
 ![alt text](images/image12.png)
 
+## Deployment of the LMS Frontend on ECS Fargate
+
+1. Created an `ECS` cluster with `Fargate` as the infrastructure option - ` Using Fargate eliminates the need to provision and manage servers, making the deployment fully serverless and reducing operational overhead.`
+
+![alt text](images/image13.png)
+
+2. Created a `Task definition` with the following parameters - this defines the container execution parameters and resource requirements
+
+    * Task definition family: EduTech-LMS-Task
+    * Infrastructure requirements:
+        * Launch type: AWS Fargate
+        * Operating system/Architecture: Linux/X86_64
+        * CPU: 0.5 vCPU
+        * Memory: 1 GB
+        * Task role: EduTech-ECS-Task-Role
+        * Task execution role: EduTech-ECS-Task-Role
+    * Container - 1
+        * Name: lms-frontend
+        * Image URI: 0*************4.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend (as obtained from ECR registry)
+        * Container Port: 3000
+        * Protocol: TCP
+        * CPU: 0.25
+        * Memory hard limit: 0.5
+
+![alt text](images/image14.png) 
+
+![alt text](images/image15.png)
+
+
+
 
 
 
