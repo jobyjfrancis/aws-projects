@@ -153,31 +153,81 @@ joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-pr
 
 ## Deployment of the LMS Frontend on ECS Fargate
 
-1. Created an `ECS` cluster with `Fargate` as the infrastructure option - ` Using Fargate eliminates the need to provision and manage servers, making the deployment fully serverless and reducing operational overhead.`
+1. Created an `ECS` cluster named `EduTech-LMS-Cluster` with `Fargate` as the infrastructure option - ` Using Fargate eliminates the need to provision and manage servers, making the deployment fully serverless and reducing operational overhead.`
 
 ![alt text](images/image13.png)
 
 2. Created a `Task definition` with the following parameters - this defines the container execution parameters and resource requirements
 
-    * Task definition family: EduTech-LMS-Task
-    * Infrastructure requirements:
-        * Launch type: AWS Fargate
-        * Operating system/Architecture: Linux/X86_64
-        * CPU: 0.5 vCPU
-        * Memory: 1 GB
-        * Task role: EduTech-ECS-Task-Role
-        * Task execution role: EduTech-ECS-Task-Role
-    * Container - 1
-        * Name: lms-frontend
-        * Image URI: 0*************4.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend (as obtained from ECR registry)
-        * Container Port: 3000
-        * Protocol: TCP
-        * CPU: 0.25
-        * Memory hard limit: 0.5
+    * `Task definition family`: EduTech-LMS-Task-Def
+    * `Infrastructure requirements`:
+        * `Launch type`: AWS Fargate
+        * `Operating system/Architecture`: Linux/X86_64
+        * `CPU`: 0.5 vCPU
+        * `Memory`: 1 GB
+        * `Task role`: EduTech-ECS-Task-Role
+        * `Task execution role`: EduTech-ECS-Task-Role
+    * `Container - 1`
+        * `Name`: lms-frontend
+        * `Image URI`: 0*************4.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend (as obtained from ECR registry)
+        * `Container Port`: 3000
+        * `Protocol`: TCP
+        * `CPU`: 0.25
+        * `Memory hard limit`: 0.5
 
-![alt text](images/image14.png) 
-
+![alt text](images/image14.png)
 ![alt text](images/image15.png)
+
+3. Created an Application Load Balancer with the following parameters: `Using an Application Load Balancer enables advanced routing capabilities, health checks, andhigh availability across multiple availability zones`
+
+    * `Name`: EduTech-LMS-ALB
+    * `Scheme`: Internet-facing
+    * `IP address type`: IPv4
+    * `VPC`: EduTech-VPC
+    * `Availability Zones and subnets`: Select both
+    * `Security groups`: EduTech-ALB-SG
+    * `Listeners and routing`
+        * Keep the default HTTP on port 80
+        * `Routing action`: Forward to target groups
+        * `Create a target group`:
+            * `target type`: IP addresses
+            * `Name`: EduTech-LMS-TG
+            * `Protocol`: HTTP, Port: 80
+            * `IP address type`: IPv4
+            * `Health check protocol`: HTTP, Health check path: /
+            * Skip registering targets (ECS service will handle this) 
+        * Refresh Load Balancer page and select the target group `EduTech-LMS-TG`   
+
+![alt text](images/image16.png)
+![alt text](images/image17.png)
+
+4. Created an ECS service with the following parameters: `The service configuration ensures your container remains available and connects it to the load balancer for handling incoming traffic`
+
+    * `Task definition family`: EduTech-LMS-Task-Def
+    * `Task definition revision`: 1
+    * `Service name`: EduTech-LMS-Service
+    * `Launch type`: Fargate
+    * `Platform version`: LATEST
+    * `Scheduling strategy`: Replica
+    * `Desired tasks`: 1
+    * `VPC`: EduTech-VPC
+    * `Security group name`: EduTech-Container-SG
+    * `Load balancer type`: Application Load Balancer
+    * `Container`: lms-frontend 3000:3000
+    * `Use an existing load balancer`: ticked
+    * `Load balance`r: EduTech-LMS-ALB
+    * Use an existing listener
+    * Use an existing target group
+
+![alt text](images/image18.png)
+![alt text](images/image19.png)
+
+5. Accessed the LMS frontend application using the ALB DNS name and confirmed that it is accessible
+
+![alt text](images/image20.png)
+
+
+
 
 
 
