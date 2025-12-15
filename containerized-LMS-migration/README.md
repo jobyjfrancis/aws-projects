@@ -76,7 +76,7 @@ The project contains the following steps:
 
 #### Docker login to the Amazon ECR repository
 ```
-joby@LAPTOP-KVPR8SO6:~/learn/aws-projects (main)$ aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin 041332534734.dkr.ecr.ap-southeast-2.amazonaws.com
+joby@LAPTOP-KVPR8SO6:~/learn/aws-projects (main)$ aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin *****************.dkr.ecr.ap-southeast-2.amazonaws.com
 Login Succeeded
 joby@LAPTOP-KVPR8SO6:~/learn/aws-projects (main)$
 ```
@@ -118,21 +118,21 @@ joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-pr
 ```
 #### Tag the docker image appropriately so that it can be pushed to Amazon ECR 
 ```
-joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$ docker tag edutech-lms-frontend:latest 041332534734.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend:latest
+joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$ docker tag edutech-lms-frontend:latest ***************.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend:latest
 joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$
 joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$
 ```
 ```
 joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$ docker images
 REPOSITORY                                                               TAG       IMAGE ID       CREATED      SIZE
-041332534734.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend   latest    7c86939d65a5   4 days ago   1.28GB
+***************.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend   latest    7c86939d65a5   4 days ago   1.28GB
 edutech-lms-frontend                                                     latest    7c86939d65a5   4 days ago   1.28GB
 joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$
 ```
 #### Push the docker image to ECR repository
 ```
-joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$ docker push 041332534734.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend:latest
-The push refers to repository [041332534734.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend]
+joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-project/frontend (main)$ docker push ***************.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend:latest
+The push refers to repository [***************.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend]
 eee371b9ce3f: Layer already exists
 a0dbbb7f946b: Layer already exists
 14a72bc6a89c: Layer already exists
@@ -169,7 +169,7 @@ joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-pr
         * `Task execution role`: EduTech-ECS-Task-Role
     * `Container - 1`
         * `Name`: lms-frontend
-        * `Image URI`: 0*************4.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend (as obtained from ECR registry)
+        * `Image URI`: ***************.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend (as obtained from ECR registry)
         * `Container Port`: 3000
         * `Protocol`: TCP
         * `CPU`: 0.25
