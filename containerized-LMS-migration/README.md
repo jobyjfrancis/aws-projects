@@ -6,18 +6,16 @@ Crown EduTech is an organisation that provides technical online learning for use
 
 ## Solution:
 
-A containerized LMS frontend on AWS ECS Fargate with monitoring capabilities. This project demonstrates how AWS container services work together and explore basic troubleshooting skills for common misconfigurations.
+A containerized LMS frontend on AWS ECS Fargate with monitoring capabilities. This project demonstrates how to setup the required infrastructure, containerise an application and deploy it in AWS container service - ECS.
 
 ## Steps to be performed:
 
 The project contains the following steps:
 
+* Architecture diagram
 * Setting up the AWS environment for containerized applications
 * Container image preparation for the LMS frontend
 * Deploying the LMS frontend on ECS Fargate
-* Comprehensive troubleshooting of container issues in ECS
-* Resolving ALB configuration issues
-* Correcting security group misconfigurations
 
 ## Services Used
 * Amazon ECS with Fargate: Serverless compute engine for containers
@@ -28,6 +26,10 @@ The project contains the following steps:
 * AWS Security Groups: Virtual firewalls controlling network traffic
 
 # Actions performed:
+
+## Architecture diagram
+
+![alt text](lms-frontend-ecs-aws.png)
 
 ## Setup of AWS environment
 
