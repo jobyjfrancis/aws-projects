@@ -180,7 +180,7 @@ joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-pr
 ![alt text](images/image14.png)
 ![alt text](images/image15.png)
 
-3. Created an Application Load Balancer with the following parameters: `Using an Application Load Balancer enables advanced routing capabilities, health checks, andhigh availability across multiple availability zones`
+3. Created an Application Load Balancer with the following parameters: `Using an Application Load Balancer enables advanced routing capabilities, health checks, and high availability across multiple availability zones`
 
     * `Name`: EduTech-LMS-ALB
     * `Scheme`: Internet-facing
@@ -217,7 +217,7 @@ joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-pr
     * `Load balancer type`: Application Load Balancer
     * `Container`: lms-frontend 3000:3000
     * `Use an existing load balancer`: ticked
-    * `Load balance`r: EduTech-LMS-ALB
+    * `Load balancer`: EduTech-LMS-ALB
     * Use an existing listener
     * Use an existing target group
 
