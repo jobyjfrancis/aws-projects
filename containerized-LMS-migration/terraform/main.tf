@@ -82,26 +82,26 @@ resource "aws_security_group" "edutech_alb_sg" {
   vpc_id      = module.edutech_vpc.vpc_id
 
   ingress {
-    description      = "Allow HTTP from anywhere"
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    description = "Allow HTTP from anywhere"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    description      = "Allow HTTPS from anywhere"
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    description = "Allow HTTPS from anywhere"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {
@@ -143,47 +143,6 @@ resource "aws_ecr_repository" "edutech_lms_frontend" {
   }
 }
 
-resource "aws_ecs_cluster" "edutech_lms_cluster" {
-  name = "EduTech-LMS-Cluster"
-  capacity_providers = ["FARGATE"]
-  tags = {
-    Name = "EduTech-LMS-Cluster"
-  }
-}
-
-resource "aws_ecs_task_definition" "edutech_lms_task_def" {
-  family                   = "EduTech-LMS-Task-Def"
-  requires_compatibilities = ["FARGATE"]
-  network_mode             = "awsvpc"
-  cpu                      = "512" # 0.5 vCPU
-  memory                   = "1024" # 1 GB
-  execution_role_arn       = aws_iam_role.edutech_ecs_task_role.arn
-  task_role_arn            = aws_iam_role.edutech_ecs_task_role.arn
-  runtime_platform {
-    operating_system_family = "LINUX"
-    cpu_architecture        = "X86_64"
-  }
-
-  container_definitions = jsonencode([
-    {
-      name      = "lms-frontend"
-      image     = "***************.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend"
-      cpu       = 256 # 0.25 vCPU
-      memory    = 512 # 0.5 GB
-      essential = true
-      portMappings = [
-        {
-          containerPort = 3000
-          protocol      = "tcp"
-        }
-      ]
-    }
-  ])
-  tags = {
-    Name = "EduTech-LMS-Task-Def"
-  }
-}
-
 resource "aws_lb" "edutech_lms_alb" {
   name               = "EduTech-LMS-ALB"
   internal           = false
@@ -198,7 +157,7 @@ resource "aws_lb" "edutech_lms_alb" {
 
 resource "aws_lb_target_group" "edutech_lms_tg" {
   name        = "EduTech-LMS-TG"
-  port        = 80
+  port        = 3000
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = module.edutech_vpc.vpc_id
@@ -222,10 +181,62 @@ resource "aws_lb_listener" "edutech_lms_http" {
   }
 }
 
+resource "aws_ecs_cluster" "edutech_lms_cluster" {
+  name = "EduTech-LMS-Cluster"
+  tags = {
+    Name = "EduTech-LMS-Cluster"
+  }
+}
+
+resource "aws_ecs_cluster_capacity_providers" "edutech_lms_cluster_capacity_providers" {
+  cluster_name = aws_ecs_cluster.edutech_lms_cluster.name
+
+  capacity_providers = ["FARGATE"]
+
+  default_capacity_provider_strategy {
+    base              = 1
+    weight            = 100
+    capacity_provider = "FARGATE"
+  }
+}
+
+resource "aws_ecs_task_definition" "edutech_lms_task_def" {
+  family                   = "EduTech-Task-Def"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = "512" # 0.5 vCPU
+  memory                   = "1024" # 1 GB
+  execution_role_arn       = aws_iam_role.edutech_ecs_task_role.arn
+  task_role_arn            = aws_iam_role.edutech_ecs_task_role.arn
+  runtime_platform {
+    operating_system_family = "LINUX"
+    cpu_architecture        = "X86_64"
+  }
+
+  container_definitions = jsonencode([
+    {
+      name      = "lms-frontend"
+      image     = "041332534734.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend"
+      cpu       = 256 # 0.25 vCPU
+      memory    = 512 # 0.5 GB
+      essential = true
+      portMappings = [
+        {
+          containerPort = 3000
+          protocol      = "tcp"
+        }
+      ]
+    }
+  ])
+  tags = {
+    Name = "EduTech-LMS-Task-Def"
+  }
+}
+
 resource "aws_ecs_service" "edutech_lms_service" {
   name            = "EduTech-LMS-Service"
   cluster         = aws_ecs_cluster.edutech_lms_cluster.id
-  task_definition = "${aws_ecs_task_definition.edutech_lms_task_def.family}:1"
+  task_definition = aws_ecs_task_definition.edutech_lms_task_def.arn
   launch_type     = "FARGATE"
   platform_version = "LATEST"
   scheduling_strategy = "REPLICA"
@@ -233,6 +244,7 @@ resource "aws_ecs_service" "edutech_lms_service" {
   network_configuration {
     security_groups = [aws_security_group.edutech_container_sg.id]
     subnets         = module.edutech_vpc.public_subnets
+    assign_public_ip = true
     }
   load_balancer {
     target_group_arn = aws_lb_target_group.edutech_lms_tg.arn
