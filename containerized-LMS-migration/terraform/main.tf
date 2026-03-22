@@ -3,6 +3,7 @@ provider "aws" {
 }
 
 variable "aws_region" {}
+variable "container_image" {}
 
 resource "aws_iam_role" "edutech_ecs_service_role" {
   name = "EduTech-ECS-Service-Role"
@@ -216,7 +217,7 @@ resource "aws_ecs_task_definition" "edutech_lms_task_def" {
   container_definitions = jsonencode([
     {
       name      = "lms-frontend"
-      image     = "041332534734.dkr.ecr.ap-southeast-2.amazonaws.com/edutech-lms-frontend"
+      image     = var.container_image
       cpu       = 256 # 0.25 vCPU
       memory    = 512 # 0.5 GB
       essential = true
