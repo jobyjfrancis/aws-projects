@@ -62,6 +62,8 @@ The project contains the following steps:
     systemctl enable nginx
     ```
 
+![alt text](images/image.png)
+
 ## Github repository configuration for the Globalmart application
 
 1. The application repository for the GlobalMart application has been developed and hosted at https://github.com/jobyjfrancis/globalmart-catalog
@@ -99,7 +101,11 @@ The project contains the following steps:
         * Tags:
             * Key: Project, Value: GlobalMart
 
+![alt text](images/image1.png)
+
 2. Attached the role `GlobalMart-EC2-Role` to the EC2 instance
+
+![alt text](images/image2.png)
 
 ## Deployment: AWS CodeDeploy setup
 
@@ -111,6 +117,8 @@ The project contains the following steps:
 
 The EC2/On-premises compute platform is selected because we're deploying to an EC2 instance. CodeDeploy supports multiple deployment targets (including Lambda and ECS), but for traditional web applications hosted on virtual machines, EC2/On-premises is the appropriate choice.
 
+![alt text](images/image3.png)
+
 2. Created the Deployment Group
     * Name: `GlobalMart-Production`
     * Service role: `GlobalMart-CodeDeploy-Role`
@@ -118,13 +126,16 @@ The EC2/On-premises compute platform is selected because we're deploying to an E
     * Environment configuration: Amazon EC2 instances
     * Tag group:
         * Key: Name, Value: GlobalMart-WebServer
+    * Install AWS CodeDeploy Agent: Now and schedule updates
     * Deployment settings: CodeDeployDefault.OneAtATime
 
-    ```This deployment configuration updates instances sequentially rather than all at once, which is a safer approach that minimizes risk. Even though we currently have only one instance, using this setting prepares your pipeline for scaling to multiple instances in the future.```
+This deployment configuration updates instances sequentially rather than all at once, which is a safer approach that minimizes risk. Even though we currently have only one instance, using this setting prepares your pipeline for scaling to multiple instances in the future.
 
     * Load balancer: Uncheck "Enable load balancing"
 
-    ```For a single-instance deployment, load balancing isn't necessary. Load balancers are used to distribute traffic across multiple instances, which would be important in a production environment with multiple servers```
+For a single-instance deployment, load balancing isn't necessary. Load balancers are used to distribute traffic across multiple instances, which would be important in a production environment with multiple servers
+
+![alt text](images/image4.png)
         
 ## Pipeline: AWS CodePipeline setup
 
@@ -149,16 +160,39 @@ The EC2/On-premises compute platform is selected because we're deploying to an E
         ```
         * Environment variables: None required
         * VPC ID: blank
+        * Input artifacts: SourceArtifact (default)
     * Test Stage: Skip
     * Deploy Stage
         * Provider: AWS CodeDeploy
-        * Region: Australia(Sydney)
+        * Region: Asia Pacific(Sydney)
         * Application name: `GlobalMart-Catalog`
         * Deployment group: `GlobalMart-Production`
     * Review and create the Pipeline
 
+![alt text](images/image5.png)
+![alt text](images/image6.png)
+![alt text](images/image7.png)
+![alt text](images/image8.png)
+
 2. After the Pipeline creation, it would automatically start the Pipeline and execute all the stages
+    * the first pipeline run would fail in the deploy stage as it cannot find the `build` folder from the source artifact
+    ![alt text](images/image9.png)
+    ![alt text](images/image10.png)
+    * Fix it by editing the CodePipeline `build` stage and add the output artifact
+        * Name: build-artifact
+        * Files
+            * build/**/*
+            * scripts/*
+            * appspec.yml
+    ![alt text](images/image11.png)
+    * Also update the `deploy` stage to use Input artifacts to `build-artifact`
+    ![alt text](images/image12.png) 
+    * Save the Pipeline settings and then `Release change`
+    * Confirm that the Pipeline executed successfully
+    ![alt text](images/image13.png)
 
 3. Once the Pipeline finishes execution, access the website using the public IP address of the EC2 instance
+
+![alt text](images/image14.png)
 
 
