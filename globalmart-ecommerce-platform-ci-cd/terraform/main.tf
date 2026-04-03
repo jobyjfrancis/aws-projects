@@ -4,19 +4,19 @@ provider "aws" {
 
 variable "aws_region" {}
 variable "keypair_name" {}
-variable "subnet_id" {}
 variable "market_place_amazon_linux_ami_alias" {}
+variable "cidr_ipv4" {}
 
 data "aws_subnet" "default_subnet" {
-  id             = var.subnet_id
-  default_for_az = true
+  default_for_az    = true
+  availability_zone = "${var.aws_region}a"
 }
 
 resource "aws_security_group" "globalmart_web_sg" {
   name        = "Globalmart-SG"
   description = "Allow HTTP/HTTPS from anywhere and SSH from my IP"
   tags = {
-    Name = "Globalmart-SG"
+    Name = "Globalmart-web-SG"
   }
 }
 
@@ -41,7 +41,7 @@ resource "aws_vpc_security_group_ingress_rule" "https" {
 resource "aws_vpc_security_group_ingress_rule" "ssh" {
   security_group_id = aws_security_group.globalmart_web_sg.id
 
-  cidr_ipv4   = "0.0.0.0/0"
+  cidr_ipv4   = var.cidr_ipv4
   from_port   = 22
   ip_protocol = "tcp"
   to_port     = 22
@@ -50,13 +50,13 @@ resource "aws_vpc_security_group_ingress_rule" "ssh" {
 resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
   security_group_id = aws_security_group.globalmart_web_sg.id
   cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1" # semantically equivalent to all ports
+  ip_protocol       = "-1"
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv6" {
   security_group_id = aws_security_group.globalmart_web_sg.id
   cidr_ipv6         = "::/0"
-  ip_protocol       = "-1" # semantically equivalent to all ports
+  ip_protocol       = "-1"
 }
 
 module "ec2_instance" {
@@ -68,6 +68,7 @@ module "ec2_instance" {
   key_name               = var.keypair_name
   ami_ssm_parameter      = var.market_place_amazon_linux_ami_alias
   monitoring             = true
+  create_security_group  = false
   subnet_id              = data.aws_subnet.default_subnet.id
   vpc_security_group_ids = [aws_security_group.globalmart_web_sg.id]
   user_data              = <<-EOF
