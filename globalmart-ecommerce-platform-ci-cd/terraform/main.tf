@@ -6,6 +6,12 @@ variable "aws_region" {}
 variable "keypair_name" {}
 variable "market_place_amazon_linux_ami_alias" {}
 variable "cidr_ipv4" {}
+variable "github_username" {}
+variable "github_repository" {}
+variable "github_repo_branch" {}
+variable "github_oauth_token" {}
+
+data "aws_caller_identity" "current" {}
 
 # Required IAM Roles for EC2 and CodeDeploy
 module "iam_ec2_role" {
@@ -75,7 +81,7 @@ module "iam_policy_s3_access" {
 
   name        = "AWSCodePipelineServiceRole-ap-southeast-2-globalmart-pipeline"
   path        = "/"
-  description = "My example policy"
+  description = "S3 access policy for CodePipeline"
 
   policy = <<-EOF
     {
@@ -90,11 +96,11 @@ module "iam_policy_s3_access" {
                 "s3:GetBucketLocation"
             ],
             "Resource": [
-                "arn:aws:s3:::[[pipeArtifactBucketNames]]"
+                "arn:aws:s3:::codepipeline-ap-southeast-2-*"
             ],
             "Condition": {
                 "StringEquals": {
-                    "aws:ResourceAccount": {{accountId}}
+                    "aws:ResourceAccount": "${data.aws_caller_identity.current.account_id}"
                 }
             }
         },
@@ -102,17 +108,17 @@ module "iam_policy_s3_access" {
             "Sid": "AllowS3ObjectAccess",
             "Effect": "Allow",
             "Action": [
-                "s3:PutObject",
-                "s3:PutObjectAcl",
                 "s3:GetObject",
-                "s3:GetObjectVersion"
+                "s3:GetObjectVersion",
+                "s3:PutObject",
+                "s3:PutObjectAcl"
             ],
             "Resource": [
-                "arn:aws:s3:::[[pipeArtifactBucketNames]]"
+                "arn:aws:s3:::codepipeline-ap-southeast-2-*/*"
             ],
             "Condition": {
                 "StringEquals": {
-                    "aws:ResourceAccount": {{accountId}}
+                    "aws:ResourceAccount": "${data.aws_caller_identity.current.account_id}"
                 }
             }
         }
@@ -138,15 +144,12 @@ module "iam_policy_codedeploy_access" {
             "Action": [
                 "codedeploy:CreateDeployment",
                 "codedeploy:GetApplication",
-                "codedeploy:GetDeployment",
-                "codedeploy:RegisterApplicationRevision",
-                "codedeploy:ListDeployments",
-                "codedeploy:ListDeploymentGroups",
-                "codedeploy:GetDeploymentGroup"
+                "codedeploy:GetDeploymentGroup",
+                "codedeploy:GetDeploymentConfig"
             ],
             "Resource": [
-                "arn:aws:codedeploy:*:{{accountId}}:application:GlobalMart-Catalog",
-                "arn:aws:codedeploy:*:{{accountId}}:deploymentgroup:GlobalMart-Catalog/*"
+                "arn:aws:codedeploy:*:${data.aws_caller_identity.current.account_id}:application:GlobalMart-Catalog",
+                "arn:aws:codedeploy:*:${data.aws_caller_identity.current.account_id}:deploymentgroup:GlobalMart-Production/*"
             ]
         },
         {
@@ -155,7 +158,7 @@ module "iam_policy_codedeploy_access" {
                 "codedeploy:GetDeploymentConfig"
             ],
             "Resource": [
-                "arn:aws:codedeploy:*:{{accountId}}:deploymentconfig:CodeDeployDefault.OneAtATime"
+                "arn:aws:codedeploy:*:${data.aws_caller_identity.current.account_id}:deploymentconfig:CodeDeployDefault.OneAtATime"
             ]
         },
         {
@@ -192,8 +195,8 @@ module "iam_policy_cloudwatch_logs_access" {
                 "logs:PutLogEvents"
             ],
             "Resource": [
-                "arn:aws:logs:ap-southeast-2:{{accountId}}:log-group:/aws/codepipeline/globalmart-pipeline",
-                "arn:aws:logs:ap-southeast-2:{{accountId}}:log-group:/aws/codepipeline/globalmart-pipeline:log-stream:*"
+                "arn:aws:logs:ap-southeast-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/codepipeline/globalmart-pipeline",
+                "arn:aws:logs:ap-southeast-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/codepipeline/globalmart-pipeline:log-stream:*"
             ]
         }
     ]
@@ -368,10 +371,12 @@ module "iam_codepipeline_role" {
 #   }
 # }
 
-# Create a CodePipeline pipeline that integrates with GitHub as the source and CodeDeploy as the deployment provider  
+# # Create a CodePipeline pipeline that integrates with GitHub as the source and CodeDeploy as the deployment provider  
 # resource "aws_codepipeline" "globalmart_codepipeline" {
 #   name     = "GlobalMart-Pipeline"
-#   role_arn = module.iam_codedeploy_role.arn
+#   pipeline_type = "V2"
+#   role_arn = module.iam_codepipeline_role.arn
+#   execution_mode = "QUEUED"
 
 #   artifact_store {
 #     location = aws_s3_bucket.codepipeline_artifacts.bucket
@@ -390,10 +395,28 @@ module "iam_codepipeline_role" {
 #       output_artifacts = ["SourceOutput"]
 
 #       configuration = {
-#         Owner  = "your-github-username"
-#         Repo   = "your-repo-name"
-#         Branch = "main"
+#         Owner  = var.github_username
+#         Repo   = var.github_repository
+#         Branch = var.github_repo_branch
 #         OAuthToken = var.github_oauth_token
+#       }
+#     }
+#   }
+
+#   stage {
+#     name = "Build"
+
+#     action {
+#       name             = "BuildAction"
+#       category         = "Build"
+#       owner            = "AWS"
+#       provider         = "Commands"
+#       version          = "1"
+#       input_artifacts  = ["SourceOutput"]
+#       output_artifacts = ["BuildOutput"]
+
+#       configuration = {
+#         ProjectName = aws_codebuild_project.globalmart_codebuild_project.name
 #       }
 #     }
 #   }
