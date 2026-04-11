@@ -76,10 +76,10 @@ module "iam_codedeploy_role" {
 
 # Create required IAM policies for CodePipeline role
 # S3 access policy
-module "iam_policy_s3_access" {
+module "codepipeline_s3_access_policy" {
   source = "terraform-aws-modules/iam/aws//modules/iam-policy"
 
-  name        = "CodePipeline-S3-ap-southeast-2-globalmart-pipeline"
+  name        = "CodePipeline-S3-access-globalmart-policy"
   path        = "/"
   description = "S3 access policy for CodePipeline"
 
@@ -96,7 +96,7 @@ module "iam_policy_s3_access" {
                 "s3:GetBucketLocation"
             ],
             "Resource": [
-                "arn:aws:s3:::codepipeline-ap-southeast-2-*"
+                "arn:aws:s3:::codepipeline-${var.aws_region}-*"
             ],
             "Condition": {
                 "StringEquals": {
@@ -114,7 +114,7 @@ module "iam_policy_s3_access" {
                 "s3:PutObjectAcl"
             ],
             "Resource": [
-                "arn:aws:s3:::codepipeline-ap-southeast-2-*/*"
+                "arn:aws:s3:::codepipeline-${var.aws_region}-*/*"
             ],
             "Condition": {
                 "StringEquals": {
@@ -125,13 +125,17 @@ module "iam_policy_s3_access" {
     ]
   }
 EOF
+
+  tags = {
+    Project = "GlobalMart"
+  }
 }
 
 # CodeDeploy access policy
-module "iam_policy_codedeploy_access" {
+module "codepipeline_codedeploy_access_policy" {
   source = "terraform-aws-modules/iam/aws//modules/iam-policy"
 
-  name        = "CodePipeline-CodeDeploy-ap-southeast-2-globalmart-pipeline"
+  name        = "CodePipeline-CodeDeploy-access-globalmart-policy"
   path        = "/"
   description = "CodeDeploy access policy for CodePipeline"
 
@@ -176,13 +180,17 @@ module "iam_policy_codedeploy_access" {
     ]
   }
 EOF
+
+  tags = {
+    Project = "GlobalMart"
+  }
 }
 
 # Create an IAM policy for CodePipeline to allow it to use Codebuild
-module "iam_policy_codebuild_access_codepipeline" {
+module "codepipeline_codebuild_access_policy" {
   source = "terraform-aws-modules/iam/aws//modules/iam-policy"
 
-  name        = "CodePipeline-CodeBuild-ap-southeast-2-globalmart-pipeline"
+  name        = "CodePipeline-CodeBuild-access-globalmart-policy"
   path        = "/"
   description = "CodeBuild access policy for CodePipeline"
 
@@ -204,13 +212,17 @@ module "iam_policy_codebuild_access_codepipeline" {
     ]
   }
 EOF
+
+  tags = {
+    Project = "GlobalMart"
+  }
 }
 
 # Cloudwatch logs access policy
-module "iam_policy_cloudwatch_logs_access" {
+module "codepipeline_cloudwatch_logs_access_policy" {
   source = "terraform-aws-modules/iam/aws//modules/iam-policy"
 
-  name        = "CodePipeline-Commands-ap-southeast-2-globalmart-pipeline"
+  name        = "CodePipeline-CloudWatchLogs-access-globalmart-policy"
   path        = "/"
   description = "CloudWatch Logs access policy for CodePipeline"
 
@@ -226,21 +238,29 @@ module "iam_policy_cloudwatch_logs_access" {
                 "logs:PutLogEvents"
             ],
             "Resource": [
-                "arn:aws:logs:ap-southeast-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/codepipeline/globalmart-pipeline",
-                "arn:aws:logs:ap-southeast-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/codepipeline/globalmart-pipeline:log-stream:*"
+                "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/codepipeline/globalmart-pipeline",
+                "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/codepipeline/globalmart-pipeline:log-stream:*"
             ]
         }
     ]
   }
+
+  tags = {
+    Project = "GlobalMart"
+  }
 EOF
+
+  tags = {
+    Project = "GlobalMart"
+  }
 }
 
 # Create CodePipeline role and attach the necessary policies
-module "iam_codepipeline_role" {
+module "codepipeline_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.4.0"
 
-  name            = "AWSCodePipelineServiceRole-ap-southeast-2-globalmart-pipeline"
+  name            = "AWSCodePipelineServiceRole-${var.aws_region}-globalmart-pipeline"
   use_name_prefix = false
 
   trust_policy_permissions = {
@@ -257,10 +277,10 @@ module "iam_codepipeline_role" {
   }
 
   policies = {
-    CodePipeline-S3-ap-southeast-2-globalmart-pipeline         = module.iam_policy_s3_access.arn,
-    CodePipeline-CodeDeploy-ap-southeast-2-globalmart-pipeline = module.iam_policy_codedeploy_access.arn,
-    CodePipeline-CodeBuild-ap-southeast-2-globalmart-pipeline  = module.iam_policy_codebuild_access_codepipeline.arn,
-    CodePipeline-Commands-ap-southeast-2-globalmart-pipeline   = module.iam_policy_cloudwatch_logs_access.arn
+    CodePipeline-S3-globalmart-pipeline             = module.codepipeline_s3_access_policy.arn,
+    CodePipeline-CodeDeploy-globalmart-pipeline     = module.codepipeline_codedeploy_access_policy.arn,
+    CodePipeline-CodeBuild-globalmart-pipeline      = module.codepipeline_codebuild_access_policy.arn,
+    CodePipeline-CloudWatchLogs-globalmart-pipeline = module.codepipeline_cloudwatch_logs_access_policy.arn
   }
 
   tags = {
@@ -272,7 +292,7 @@ module "iam_codepipeline_role" {
 module "iam_policy_codebuild_access" {
   source = "terraform-aws-modules/iam/aws//modules/iam-policy"
 
-  name        = "CodeBuild-ap-southeast-2-globalmart-pipeline"
+  name        = "CodeBuild-${var.aws_region}-globalmart-pipeline-policy"
   path        = "/"
   description = "CodeBuild access policy for S3 and CloudWatch Logs"
 
@@ -288,8 +308,8 @@ module "iam_policy_codebuild_access" {
                 "logs:PutLogEvents"
             ],
             "Resource": [
-                "arn:aws:logs:ap-southeast-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/codebuild/globalmart-build",
-                "arn:aws:logs:ap-southeast-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/codebuild/globalmart-build:log-stream:*"
+                "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/codebuild/globalmart-build",
+                "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/codebuild/globalmart-build:log-stream:*"
             ]
         },
         {
@@ -300,13 +320,17 @@ module "iam_policy_codebuild_access" {
                 "s3:GetBucketVersioning"
             ],
             "Resource": [
-                "arn:aws:s3:::codepipeline-ap-southeast-2-*",
-                "arn:aws:s3:::codepipeline-ap-southeast-2-*/*"
+                "arn:aws:s3:::codepipeline-${var.aws_region}-*",
+                "arn:aws:s3:::codepipeline-${var.aws_region}-*/*"
             ]
         }
     ]
   }
 EOF
+
+  tags = {
+    Project = "GlobalMart"
+  }
 }
 
 # Create CodeBuild IAM role
@@ -331,7 +355,7 @@ module "iam_codebuild_role" {
   }
 
   policies = {
-    CodeBuild-S3-ap-southeast-2-globalmart-pipeline = module.iam_policy_codebuild_access.arn
+    CodeBuild-globalmart-pipeline = module.iam_policy_codebuild_access.arn
   }
 
   tags = {
@@ -469,8 +493,8 @@ resource "aws_codedeploy_deployment_group" "globalmart_codedeploy_deployment_gro
 
 # Create an S3 bucket for CodePipeline artifact storage
 resource "aws_s3_bucket" "codepipeline_artifact_bucket" {
-  bucket         = "codepipeline-${var.aws_region}-${data.aws_caller_identity.current.account_id}"
-  force_destroy  = true
+  bucket        = "codepipeline-${var.aws_region}-${data.aws_caller_identity.current.account_id}"
+  force_destroy = true
   tags = {
     Project = "GlobalMart"
   }
@@ -531,7 +555,7 @@ resource "aws_codestarconnections_connection" "github_connection" {
 resource "aws_codepipeline" "globalmart_codepipeline" {
   name           = "GlobalMart-Pipeline"
   pipeline_type  = "V2"
-  role_arn       = module.iam_codepipeline_role.arn
+  role_arn       = module.codepipeline_role.arn
   execution_mode = "QUEUED"
 
   artifact_store {
@@ -617,10 +641,3 @@ resource "aws_codepipeline" "globalmart_codepipeline" {
     Project = "GlobalMart"
   }
 }
-
-
-
-
-
-
-
