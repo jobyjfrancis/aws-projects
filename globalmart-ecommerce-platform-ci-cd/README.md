@@ -30,7 +30,7 @@ The project contains the following steps:
 
 ## Architecture diagram
 
-[to do]
+![alt text](images/globalmart-ci-cd-pipeline.png)
 
 ## Setup of EC2 environment and configuration
 
