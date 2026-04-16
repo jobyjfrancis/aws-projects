@@ -30,7 +30,7 @@ The project contains the following steps:
 
 ## Architecture diagram
 
-<to-be-put>
+![alt text](images/architecture.png)
 
 ## Setup of EC2 environment and configuration
 
