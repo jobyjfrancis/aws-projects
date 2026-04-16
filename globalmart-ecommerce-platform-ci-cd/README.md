@@ -30,7 +30,7 @@ The project contains the following steps:
 
 ## Architecture diagram
 
-<To-DO>
+[to do]
 
 ## Setup of EC2 environment and configuration
 
