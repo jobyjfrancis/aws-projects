@@ -268,6 +268,40 @@ This command creates a 6GB file, which on a standard t3.micro instance with an 8
 
 4. Go to the EC2 instance -> `prod-server` -> Tags and could confirm that tags have been created
 
+## Setting Up AWS GuardDuty and Simulating Security Threats for CloudGuard
+
+1. Go to GuardDuty console -> Getting Started
+
+2. Review the "Service role permissions" section
+
+3. Click "Enable GuardDuty"
+
+### Preparing Your Dev Environment and Simulate security threat
+
+1. Reboot the `dev-server`
+
+2. Install the network mapper tool (nmap)
+
+```
+sudo yum install nmap -y
+```
+3. From the `dev-server`, perform an aggressive port scan against `prod-server`
+
+```
+sudo nmap -Pn -p 1-1000 -T4 -A [prod-server-IP]
+```
+`Pn`: Skip host discovery and assume the target is online
+`p 1-1000`: Scan ports 1-1000
+`T4`: Use aggressive timing template (faster scan)
+`A`: Enable OS detection, version detection, script scanning, and traceroute
+
+This scan simulates a reconnaissance activity that an attacker might perform before attempting to exploit vulnerabilities.
+
+4. Wait for GuardDuty to detect and report the security event. GuardDuty needs some time to analyze logs and identify patterns
+
+5. Navigate to the GuardDuty console and click on "Findings" in the left navigation pane. This would list the security findings
+
+
 
 
 
