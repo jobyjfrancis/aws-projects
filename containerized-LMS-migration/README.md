@@ -228,6 +228,10 @@ joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-pr
 
 ![alt text](images/image20.png)
 
+# Terraform Code
+
+The terraform configuration for the project can be found at [terraform](./terraform)
+
 
 
 

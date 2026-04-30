@@ -195,4 +195,10 @@ For a single-instance deployment, load balancing isn't necessary. Load balancers
 
 ![alt text](images/image14.png)
 
+# Terraform Code
+
+The terraform configuration for the project can be found at https://github.com/jobyjfrancis/aws-projects/tree/main/globalmart-ecommerce-platform-ci-cd/terraform
+
+
+
 
