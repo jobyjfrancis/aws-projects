@@ -29,7 +29,7 @@ The project contains the following steps:
 
 ## Architecture diagram
 
-![alt text](lms-frontend-ecs-aws.png)
+![alt text](images/lms-frontend-ecs-aws-architecture.png)
 
 ## Setup of AWS environment
 
