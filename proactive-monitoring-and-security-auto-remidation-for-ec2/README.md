@@ -301,6 +301,10 @@ This scan simulates a reconnaissance activity that an attacker might perform bef
 
 5. Navigate to the GuardDuty console and click on "Findings" in the left navigation pane. This would list the security findings
 
+# Terraform Code
+
+The terraform configuration for the project can be found at [terraform](./terraform)
+
 
 
 
