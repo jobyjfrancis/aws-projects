@@ -38,27 +38,27 @@ The project contains the following steps:
 
 EC2 instance 1 (Dev):
 --------------------
-* Name: dev-server
-* Additonal tag: Key: Environment, Value: Development
-* Amazon Machine Image (AMI): Amazon Linux 2023
-* Instance type: t3.micro
-* Key pair: <SSH key pair>
-* Network settings: Allow SSH traffic from your IP
+* `Name`: dev-server
+* `Additonal tag`: Key: Environment, Value: Development
+* `Amazon Machine Image` (AMI): Amazon Linux 2023
+* `Instance type`: t3.micro
+* `Key pair`: <SSH key pair>
+* `Network settings`: Allow SSH traffic from your IP
     -> Create security group: 
         -> Rule: SSH from My IP
-* Configure storage: Default (8 GB gp3)
+* `Configure storage`: Default (8 GB gp3)
 
 EC2 instance 2 (Prod):
 ---------------------
-* Name: prod-server
-* Additonal tag: Key: Environment, Value: Production
-* Amazon Machine Image (AMI): Amazon Linux 2023
-* Instance type: t3.micro
-* Key pair: <SSH key pair>
-* Network settings: Allow SSH traffic from your IP
+* `Name`: prod-server
+* `Additonal tag`: Key: Environment, Value: Production
+* `Amazon Machine Image` (AMI): Amazon Linux 2023
+* `Instance type`: t3.micro
+* `Key pair`: <SSH key pair>
+* `Network settings`: Allow SSH traffic from your IP
     -> Create security group: 
         -> Rule: SSH from My IP
-* Configure storage: Default (8 GB gp3)
+* `Configure storage`: Default (8 GB gp3)
 
 ![alt text](images/image1.png)
 
@@ -309,31 +309,31 @@ Created symlink /etc/systemd/system/multi-user.target.wants/amazon-cloudwatch-ag
 Setup a High usage CPU alarm (Dev instance)
 -------------------------------------------
 1. Create an alarm under Cloudwatch -> Alarms with the following configuration:
-    * Select metric -> EC2 -> Per-Instance Metrics
-    * Search bar: "CPUUtilization"
+    * `Select metric -> EC2 -> Per-Instance Metrics`
+    * `Search bar`: "CPUUtilization"
     * Find the `Dev` instance in the list
     * Select `CPUUtilization` metric for your instance
     * Click on `Select metric`
     
     Configure the metrics:
-    * Statistic: average
-    * Period: 1 minute
+    * `Statistic`: average
+    * `Period`: 1 minute
 
     Conditions:
-    * Threshold type: Static
+    * `Threshold type`: Static
     * Whenever CPUUtilization is: Greater than/equal to
-    * Threshold value: 85
+    * `Threshold value`: 85
 
     Actions:
     * Alarm state trigger", select "In alarm"
     * Send a notification to the following SNS topic: Create new topic
-    * Topic name: EC2_Alarms
-    * Email endpoints: <your email address>
+    * `Topic name`: EC2_Alarms
+    * `Email endpoints`: <your email address>
     * Click on `Create topic` ->  this would send an email with AWS verification link - confirm subscription to receive notifications
 
     Name and description:
-    * Alarm name: DevInstance-HighCPU
-    * Alarm description: Alerts when CPU usage exceeds 85% for 1 minute
+    * `Alarm name`: DevInstance-HighCPU
+    * `Alarm description`: Alerts when CPU usage exceeds 85% for 1 minute
 
 ![alt text](<images/image2.png>)
 
@@ -387,11 +387,11 @@ caused by: EC2MetadataError: failed to make EC2Metadata request
 
 a) To fix the issue, create an appropriate IAM role as per below:
 
-* IAM -> Roles -> Create Role
-* Trusted entity type: AWS service
-* Use case: EC2
-* Permissions policy: `CloudWatchAgentServerPolicy` managed policy
-* Role name: EC2CloudWatchAgentRole
+* `IAM -> Roles -> Create Role`
+* `Trusted entity type`: AWS service
+* `Use case`: EC2
+* `Permissions policy`: `CloudWatchAgentServerPolicy` managed policy
+* `Role name`: EC2CloudWatchAgentRole
 
 ![alt text](<images/image3.png>)
 
@@ -422,29 +422,29 @@ c) Restart `cloudwatch agent` in the Prod instance and check the logs again
 ```
 
 2. Create an alarm under Cloudwatch -> Alarms with the following configuration:
-    * Select metric -> CWAgent -> device, fstype, host, path
-    * Search bar: "disk_used_percent"
+    * `Select metric -> CWAgent` -> device, fstype, host, path
+    * `Search bar`: "disk_used_percent"
     * Find the `Prod` instance in the list
     * Select `disk_used_percent` metric for your instance
     * Click on `Select metric`
     
     Configure the metrics:
-    * Statistic: average
-    * Period: 1 minute
+    * `Statistic`: average
+    * `Period`: 1 minute
 
     Conditions:
-    * Threshold type: Static
-    * Whenever disk_used_percent is: Greater than/equal to
-    * Threshold value: 80
+    * `Threshold type`: Static
+    * `Whenever disk_used_percent is`: Greater than/equal to
+    * `Threshold value`: 80
 
     Actions:
     * Alarm state trigger", select "In alarm"
     * Send a notification to the following SNS topic: `Select an existing SNS topic`
-    * Topic name: EC2_Alarms
+    * `Topic name`: EC2_Alarms
     
     Name and description:
-    * Alarm name: ProdInstance-LowDisk
-    * Alarm description: Alerts when disk usage exceeds 80% for 1 minute
+    * `Alarm name`: ProdInstance-LowDisk
+    * `Alarm description`: Alerts when disk usage exceeds 80% for 1 minute
 
 ![alt text](<images/image5.png>)
 
@@ -453,19 +453,19 @@ c) Restart `cloudwatch agent` in the Prod instance and check the logs again
 Here we setup a Lambda function which executes in response to the high CPU or disk usage alerts from Dev or Prod instance
 
 1. Lambda console -> Create function -> Author from scratch
-    * Function name: "EC2-AutoRemediation"
-    * Runtime: "Python 3.10" 
-    * Architecture: x86_64
-    * Permissions -> Change default execution role: Create a new role with basic Lambda permissions
+    * `Function name`: "EC2-AutoRemediation"
+    * `Runtime`: "Python 3.10" 
+    * `Architecture`: x86_64
+    * `Permissions -> Change default execution role`: Create a new role with basic Lambda permissions
     * Click -> Create function 
 
 ![alt text](<images/image6.png>)
 
 2. After function creation, go to `configuration` tab
-    * Permissions: click on `EC2-AutoRemediation-role-xxxx`
+    * `Permissions`: click on `EC2-AutoRemediation-role-xxxx`
         * In the new IAM console -> attach policies
         * Search for `AmazonEC2ReadOnlyAccess` and attach it
-    * Add permissions -> Inline policy -> JSON tab
+    * Add `permissions -> Inline policy` -> JSON tab
     * Paste the following policy
             ```
             {
@@ -479,7 +479,7 @@ Here we setup a Lambda function which executes in response to the high CPU or di
                 ]
             }
             ```
-    * Click on Next -> Policy name `EC2TaggingPermissions` -> Create policy
+    * Click on Next -> Policy name `EC2TaggingPermissions` -> `Create policy`
 
     ![alt text](<images/image7.png>)
 
@@ -501,8 +501,8 @@ For simplicity, our Lambda function won't take any actual remediation action her
 1. Go to `SNS console -> Topics -> EC2_Alarm`
 
 2. Create subscription
-    * Protocol: AWS Lambda
-    * Endpoint: EC2-AutoRemediation
+    * `Protocol`: AWS Lambda
+    * `Endpoint`: EC2-AutoRemediation
 
 ![alt text](images/image9.png)
 
