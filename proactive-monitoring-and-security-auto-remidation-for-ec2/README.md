@@ -30,7 +30,7 @@ The project contains the following steps:
 
 ## Architecture diagram
 
-[To-Do]
+![alt text](images/architecture-diagram.png)
 
 ## Setup of EC2 instances for Dev and Prod environments
 
