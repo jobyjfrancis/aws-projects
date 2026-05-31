@@ -12,7 +12,6 @@ A containerized LMS frontend on AWS ECS Fargate with monitoring capabilities. Th
 
 The project contains the following steps:
 
-* Architecture diagram
 * Setting up the AWS environment for containerized applications
 * Container image preparation for the LMS frontend
 * Deploying the LMS frontend on ECS Fargate
@@ -25,11 +24,17 @@ The project contains the following steps:
 * Amazon ECR: Container registry for managing and deploying images
 * AWS Security Groups: Virtual firewalls controlling network traffic
 
-# Actions performed:
+# Terraform Code
+
+The infrastructure was defined and provisioned using Terraform
+
+The terraform configuration for the project can be found at [terraform](./terraform)
 
 ## Architecture diagram
 
 ![alt text](images/lms-frontend-ecs-aws-architecture.png)
+
+# Actions performed:
 
 ## Setup of AWS environment
 
@@ -228,9 +233,6 @@ joby@LAPTOP-KVPR8SO6:~/learn/aws-projects/containerized-LMS-migration/edutech-pr
 
 ![alt text](images/image20.png)
 
-# Terraform Code
-
-The terraform configuration for the project can be found at [terraform](./terraform)
 
 
 
