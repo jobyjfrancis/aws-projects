@@ -3,7 +3,6 @@ provider "aws" {
 }
 
 variable "aws_region" {}
-variable "container_image" {}
 
 resource "aws_iam_role" "edutech_ecs_service_role" {
   name = "EduTech-ECS-Service-Role"
@@ -136,14 +135,6 @@ resource "aws_security_group" "edutech_container_sg" {
   }
 }
 
-resource "aws_ecr_repository" "edutech_lms_frontend" {
-  name = "edutech-lms-frontend"
-  image_tag_mutability = "MUTABLE"
-  tags = {
-    Name = "edutech-lms-frontend"
-  }
-}
-
 resource "aws_lb" "edutech_lms_alb" {
   name               = "EduTech-LMS-ALB"
   internal           = false
@@ -157,11 +148,11 @@ resource "aws_lb" "edutech_lms_alb" {
 }
 
 resource "aws_lb_target_group" "edutech_lms_tg" {
-  name        = "EduTech-LMS-TG"
-  port        = 3000
-  protocol    = "HTTP"
-  target_type = "ip"
-  vpc_id      = module.edutech_vpc.vpc_id
+  name            = "EduTech-LMS-TG"
+  port            = 3000
+  protocol        = "HTTP"
+  target_type     = "ip"
+  vpc_id          = module.edutech_vpc.vpc_id
   ip_address_type = "ipv4"
   health_check {
     protocol = "HTTP"
@@ -201,11 +192,16 @@ resource "aws_ecs_cluster_capacity_providers" "edutech_lms_cluster_capacity_prov
   }
 }
 
+data "aws_ecr_image" "app_image" {
+  repository_name = "edutech-lms-frontend"
+  image_tag       = "latest"
+}
+
 resource "aws_ecs_task_definition" "edutech_lms_task_def" {
   family                   = "EduTech-Task-Def"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  cpu                      = "512" # 0.5 vCPU
+  cpu                      = "512"  # 0.5 vCPU
   memory                   = "1024" # 1 GB
   execution_role_arn       = aws_iam_role.edutech_ecs_task_role.arn
   task_role_arn            = aws_iam_role.edutech_ecs_task_role.arn
@@ -217,7 +213,7 @@ resource "aws_ecs_task_definition" "edutech_lms_task_def" {
   container_definitions = jsonencode([
     {
       name      = "lms-frontend"
-      image     = var.container_image
+      image     = data.aws_ecr_image.app_image.image_uri
       cpu       = 256 # 0.25 vCPU
       memory    = 512 # 0.5 GB
       essential = true
@@ -235,18 +231,18 @@ resource "aws_ecs_task_definition" "edutech_lms_task_def" {
 }
 
 resource "aws_ecs_service" "edutech_lms_service" {
-  name            = "EduTech-LMS-Service"
-  cluster         = aws_ecs_cluster.edutech_lms_cluster.id
-  task_definition = aws_ecs_task_definition.edutech_lms_task_def.arn
-  launch_type     = "FARGATE"
-  platform_version = "LATEST"
+  name                = "EduTech-LMS-Service"
+  cluster             = aws_ecs_cluster.edutech_lms_cluster.id
+  task_definition     = aws_ecs_task_definition.edutech_lms_task_def.arn
+  launch_type         = "FARGATE"
+  platform_version    = "LATEST"
   scheduling_strategy = "REPLICA"
-  desired_count   = 1
+  desired_count       = 1
   network_configuration {
-    security_groups = [aws_security_group.edutech_container_sg.id]
-    subnets         = module.edutech_vpc.public_subnets
+    security_groups  = [aws_security_group.edutech_container_sg.id]
+    subnets          = module.edutech_vpc.public_subnets
     assign_public_ip = true
-    }
+  }
   load_balancer {
     target_group_arn = aws_lb_target_group.edutech_lms_tg.arn
     container_name   = "lms-frontend"
