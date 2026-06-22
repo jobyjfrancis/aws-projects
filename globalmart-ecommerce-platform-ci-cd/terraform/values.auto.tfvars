@@ -1,0 +1,7 @@
+aws_region                          = "ap-southeast-2"
+keypair_name                        = "demo-key-pair"
+market_place_amazon_linux_ami_alias = "/aws/service/marketplace/prod-nzqbx6waondm6/20260330"
+cidr_ipv4                           = "118.148.168.205/32"
+github_username                     = "jobyjfrancis"
+github_repository                   = "globalmart-catalog"
+github_repo_branch                  = "main"
