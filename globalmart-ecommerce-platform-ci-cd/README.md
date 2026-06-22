@@ -6,7 +6,7 @@ GlobalMart, a leading e-commerce retailer with 300+ employees across 3 regions n
 
 ## Solution:
 
-A fully automated CI/CD pipeline using AWS CodePipeline and CodeDeploy with comprehensive monitoring capabilities. This project demonstrates how AWS DevOps services work together 
+A fully automated CI/CD pipeline using AWS services - CodePipeline, CodeBuild and CodeDeploy - with comprehensive monitoring capabilities. This project demonstrates how AWS DevOps services work together 
 
 ## Steps to be performed:
 
@@ -19,6 +19,7 @@ The project contains the following steps:
 
 ## Services Used
 * AWS CodePipeline: Fully managed continuous delivery service
+* AWS CodeBuild: Building code and packages
 * AWS CodeDeploy: Deployment service for EC2 instances
 * Amazon EC2: Compute instances for hosting the e-commerce application
 * AWS IAM: Identity and access management for AWS resources
